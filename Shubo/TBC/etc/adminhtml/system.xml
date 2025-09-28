@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="shubo_tbc" translate="label" type="text" sortOrder="30" showInDefault="1">
+                <label>TBC Payment</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="mode" translate="label" type="select" sortOrder="20" showInDefault="1">
+                    <label>Sandbox/Production Mode</label>
+                    <source_model>Shubo\TBC\Model\Source\Mode</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="merchant_id" translate="label" type="text" sortOrder="30" showInDefault="1">
+                    <label>Merchant ID</label>
+                    <depends>
+                        <field id="active">1</field>
+                        <field id="mode">0</field>
+                    </depends>
+                </field>
+                <field id="merchant_id_test" translate="label" type="text" sortOrder="40" showInDefault="1">
+                    <label>Merchant ID (test)</label>
+                    <depends>
+                        <field id="active">1</field>
+                        <field id="mode">1</field>
+                    </depends>
+                </field>
+                <field id="secret_key_for_purchases" translate="label" type="password" sortOrder="50" showInDefault="1">
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <label>Secret key for purchases</label>
+                    <depends>
+                        <field id="active">1</field>
+                        <field id="mode">0</field>
+                    </depends>
+                </field>
+                <field id="secret_key_for_purchases_test" translate="label" type="password" sortOrder="60" showInDefault="1">
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <label>Secret key for purchases (test)</label>
+                    <depends>
+                        <field id="active">1</field>
+                        <field id="mode">1</field>
+                    </depends>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="70" showInDefault="1">
+                    <label>Title</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="auto_capture" translate="label" type="select" sortOrder="80" showInDefault="1">
+                    <label>Auto capture</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If enabled, capture request will be sent by the cron job and invoice will be created automatically</comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="90" showInDefault="1">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="100" showInDefault="1">
+                    <label>Payment from Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="110" showInDefault="1">
+                    <label>Sort Order</label>
+                    <validate>validate-number</validate>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

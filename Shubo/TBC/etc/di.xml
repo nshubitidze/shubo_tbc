@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="TBCPaymentAdapter" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Shubo\TBC\Helpers\Constants::PAYMENT_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">ShuboTBCValueHandlerPool</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Magento\Payment\Block\Info</argument>
+            <argument name="commandPool" xsi:type="object">ShuboTBCGatewayCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">ShuboTBCGatewayAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">ShuboTBCGatewayCaptureCommand</item>
+                <item name="cancel" xsi:type="string">ShuboTBCGatewayVoidCommand</item>
+                <item name="void" xsi:type="string">ShuboTBCGatewayVoidCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayVoidCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">ShuboTBCGatewayVoidRequest</argument>
+            <argument name="handler" xsi:type="object">ShuboTBCGatewayVoidResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Shubo\TBC\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Shubo\TBC\Gateway\Http\Client\Transaction</argument>
+            <argument name="validator" xsi:type="object">Shubo\TBC\Gateway\Response\ResponseValidator</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Shubo\TBC\Gateway\Response\ErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayVoidRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">Shubo\TBC\Gateway\Request\VoidRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayVoidResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="txnid" xsi:type="string">Shubo\TBC\Gateway\Response\VoidHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">ShuboTBCGatewayCaptureRequest</argument>
+            <argument name="handler" xsi:type="object">ShuboTBCGatewayCaptureResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Shubo\TBC\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Shubo\TBC\Gateway\Http\Client\Transaction</argument>
+            <argument name="validator" xsi:type="object">Shubo\TBC\Gateway\Response\ResponseValidator</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Shubo\TBC\Gateway\Response\ErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">Shubo\TBC\Gateway\Request\CaptureRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayCaptureResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="txnid" xsi:type="string">Shubo\TBC\Gateway\Response\CaptureHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!--
+    As we are using embed checkout, transaction is already authorized from the frontend
+    but here we get the status for the order and make sure that it is authorized.
+    -->
+    <virtualType name="ShuboTBCGatewayAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">ShuboTBCGatewayAuthorizationRequest</argument>
+            <argument name="handler" xsi:type="object">ShuboTBCGatewayResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Shubo\TBC\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Shubo\TBC\Gateway\Http\Client\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">Shubo\TBC\Gateway\Request\AuthorizationRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCGatewayResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="txnid" xsi:type="string">Shubo\TBC\Gateway\Response\AuthorizationHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">ShuboTBCConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">ShuboTBCConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ShuboTBCConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Shubo\TBC\Helpers\Constants::PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Custom Logger -->
+    <type name="Shubo\TBC\Gateway\Http\Client\Transaction">
+        <arguments>
+            <argument name="logger" xsi:type="object">Shubo\TBC\Model\Logger</argument>
+        </arguments>
+    </type>
+
+    <type name="Shubo\TBC\Cron\Capture">
+        <arguments>
+            <argument name="logger" xsi:type="object">Shubo\TBC\Model\Logger</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Shubo\TBC\Model\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="info" xsi:type="object">Shubo\TBC\Model\Logger\Info</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Shubo\TBC\Model\Logger\Info" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/tbc/info.log</argument>
+        </arguments>
+    </virtualType>
+</config>
